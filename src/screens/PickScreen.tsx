@@ -12,6 +12,7 @@ import Animated, {FadeInDown, FadeInUp} from 'react-native-reanimated';
 
 import {RootStackParamList} from '../navigation';
 import {Background} from '../components/Background';
+import {BackButton} from '../components/BackButton';
 import {PressableScale} from '../components/PressableScale';
 import {HUNTS, HuntTheme} from '../config/themes';
 import {colors, fonts, fontSizes, radius, shadow} from '../theme';
@@ -43,6 +44,7 @@ export function PickScreen({navigation}: Props) {
           </Animated.View>
         ))}
       </ScrollView>
+      <BackButton />
     </Background>
   );
 }

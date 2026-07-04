@@ -15,6 +15,7 @@ import {PillButton} from '../components/PillButton';
 import {RewardBurst} from '../components/RewardBurst';
 import {LottieSafe} from '../components/LottieSafe';
 import {colors, fonts, fontSizes} from '../theme';
+import {todayKey} from '../services/gallery';
 import trophy from '../assets/lottie/trophy.json';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Win'>;
@@ -49,7 +50,10 @@ export function WinScreen({navigation, route}: Props) {
             textColor={colors.white}
             glow
             onPress={() =>
-              navigation.replace('Journal', {huntId: huntId ?? 'flowers'})
+              navigation.replace('Day', {
+                huntId: huntId ?? 'flowers',
+                dateKey: todayKey(),
+              })
             }
           />
           <View style={{height: 16}} />

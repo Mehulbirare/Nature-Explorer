@@ -12,6 +12,7 @@ import Animated, {FadeInDown, FadeInUp} from 'react-native-reanimated';
 
 import {RootStackParamList} from '../navigation';
 import {Background} from '../components/Background';
+import {BackButton} from '../components/BackButton';
 import {PillButton} from '../components/PillButton';
 import {PressableScale} from '../components/PressableScale';
 import {getHunt} from '../config/themes';
@@ -102,6 +103,7 @@ export function DayScreen({navigation, route}: Props) {
           onPress={() => navigation.goBack()}
         />
       </ScrollView>
+      <BackButton />
     </Background>
   );
 }

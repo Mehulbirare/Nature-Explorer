@@ -48,6 +48,14 @@ export function WelcomeScreen({navigation}: Props) {
             glow
             onPress={() => navigation.navigate('Pick')}
           />
+          <View style={{height: 16}} />
+          <PillButton
+            label="My Trophies 🏆"
+            size="md"
+            color={colors.white}
+            textColor={colors.primaryDark}
+            onPress={() => navigation.navigate('Trophies')}
+          />
         </Animated.View>
       </View>
     </Background>

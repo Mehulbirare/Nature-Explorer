@@ -15,6 +15,7 @@ import {
 import {RootStackParamList} from './navigation';
 import {WelcomeScreen} from './screens/WelcomeScreen';
 import {PickScreen} from './screens/PickScreen';
+import {TrophyScreen} from './screens/TrophyScreen';
 import {JournalScreen} from './screens/JournalScreen';
 import {DayScreen} from './screens/DayScreen';
 import {HuntScreen} from './screens/HuntScreen';
@@ -46,6 +47,11 @@ export default function App() {
             <Stack.Screen
               name="Pick"
               component={PickScreen}
+              options={{animation: 'slide_from_right'}}
+            />
+            <Stack.Screen
+              name="Trophies"
+              component={TrophyScreen}
               options={{animation: 'slide_from_right'}}
             />
             <Stack.Screen

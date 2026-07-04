@@ -1,12 +1,12 @@
 /**
  * Local photo album. Every photo the child captures is copied out of the camera's
- * temporary cache into a permanent "NatureExplorer" folder on the device, so the
- * pictures survive after the app closes and can be browsed later.
+ * temporary cache into a permanent "NatureExplorer" folder that lives INSIDE the
+ * app's own private storage, so the pictures survive after the app closes and can
+ * be browsed in-app.
  *
- * Uses react-native-fs (already a dependency) into app-scoped storage, so it needs
- * NO extra runtime permission on any Android version. On Android we also best-effort
- * ask the media scanner to surface the shots in the system Gallery. Never throws —
- * a failed save must never break the reward loop.
+ * Storage is app-private (the app's documents dir), so it needs NO runtime
+ * permission on any Android version and the photos are not exposed to the phone's
+ * shared Gallery. Never throws — a failed save must never break the reward loop.
  */
 
 export type SavedPhoto = {path: string; huntId: string; at: number};
@@ -22,16 +22,15 @@ function fs(): any | null {
 }
 
 /**
- * Ordered list of album folders to attempt. Shared Pictures is nicest (shows in
- * the Gallery) but is blocked by scoped storage on newer Android; app-private
- * external and the sandbox always work without any permission. We write to the
- * first one that succeeds, so a photo is ALWAYS saved somewhere on the device.
+ * Album folders to use, all app-private. The documents dir is the app's internal
+ * storage — always writable, no permission, and cleared only when the app is
+ * uninstalled. App-specific external storage is a secondary fallback. We write to
+ * the first that succeeds, so a photo is ALWAYS stored inside the app.
  */
 function albumCandidates(RNFS: any): string[] {
   return [
-    RNFS.PicturesDirectoryPath,
-    RNFS.ExternalDirectoryPath,
     RNFS.DocumentDirectoryPath,
+    RNFS.ExternalDirectoryPath,
   ]
     .filter(Boolean)
     .map(base => `${base}/NatureExplorer`);
@@ -67,16 +66,6 @@ export async function savePhoto(
       }
       const dest = `${dir}/${name}`;
       await RNFS.copyFile(src, dest);
-
-      // Best-effort: make it show up in the phone's Gallery. Ignored where unsupported.
-      try {
-        if (typeof RNFS.scanFile === 'function') {
-          await RNFS.scanFile(dest);
-        }
-      } catch {
-        // Gallery indexing is a nicety, not a requirement.
-      }
-
       return dest;
     } catch {
       // This location was not writable (e.g. scoped storage) — try the next one.

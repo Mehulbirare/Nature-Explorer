@@ -14,6 +14,7 @@ import Animated, {FadeInDown, FadeInUp} from 'react-native-reanimated';
 
 import {RootStackParamList} from '../navigation';
 import {Background} from '../components/Background';
+import {BackButton} from '../components/BackButton';
 import {PillButton} from '../components/PillButton';
 import {PressableScale} from '../components/PressableScale';
 import {getHunt} from '../config/themes';
@@ -109,6 +110,23 @@ export function JournalScreen({navigation, route}: Props) {
                 glow
                 onPress={() => navigation.navigate('Hunt', {huntId: theme.id})}
               />
+              {todayCount > 0 && (
+                <>
+                  <View style={{height: 12}} />
+                  <PillButton
+                    label="See today's photos 📸"
+                    size="md"
+                    color={theme.color}
+                    textColor={colors.white}
+                    onPress={() =>
+                      navigation.navigate('Day', {
+                        huntId: theme.id,
+                        dateKey: todayKey(),
+                      })
+                    }
+                  />
+                </>
+              )}
             </>
           )}
         </Animated.View>
@@ -135,6 +153,7 @@ export function JournalScreen({navigation, route}: Props) {
           ))
         )}
       </ScrollView>
+      <BackButton />
     </Background>
   );
 }

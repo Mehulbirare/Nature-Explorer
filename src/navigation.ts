@@ -3,6 +3,8 @@ export type RootStackParamList = {
   Welcome: undefined;
   /** Activity picker — choose which hunt to play. */
   Pick: undefined;
+  /** Trophy shelf — all earned/locked badges. */
+  Trophies: undefined;
   /** Per-hunt daily journal: today's task + a list of past days. */
   Journal: {huntId: string};
   /** The photos captured for one hunt on one calendar day. */

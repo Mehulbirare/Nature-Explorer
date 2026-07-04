@@ -1,7 +1,7 @@
 buildscript {
     ext {
         buildToolsVersion = "36.0.0"
-        minSdkVersion = 26          // required by react-native-vision-camera
+        minSdkVersion = 24          // Android 7.0+ (vision-camera itself supports down to 23)
         compileSdkVersion = 36
         targetSdkVersion = 36
         ndkVersion = "27.1.12297006"

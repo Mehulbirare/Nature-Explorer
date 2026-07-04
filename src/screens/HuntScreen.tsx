@@ -34,6 +34,7 @@ import {MotiView} from 'moti';
 
 import {RootStackParamList} from '../navigation';
 import {ProgressStars} from '../components/ProgressStars';
+import {BackButton} from '../components/BackButton';
 import {GlowingCaptureButton} from '../components/GlowingCaptureButton';
 import {RewardBurst} from '../components/RewardBurst';
 import {PillButton} from '../components/PillButton';
@@ -143,9 +144,10 @@ export function HuntScreen({navigation, route}: Props) {
     let capturedPath: string | null = null;
     try {
       if (camera.current && device) {
-        const photo = await camera.current.takePhoto({flash: 'off'});
-        capturedPath = photo.path;
-        const base64 = await readPhotoBase64(photo.path);
+        // vision-camera v5: capture the live preview and write it to a temp JPEG.
+        const image = await (camera.current as any).takeSnapshot();
+        capturedPath = await image.saveToTemporaryFileAsync('jpg', 90);
+        const base64 = capturedPath ? await readPhotoBase64(capturedPath) : null;
         const res = base64 ? await detectLabels(base64) : {ok: false, labels: []};
         if (res.ok) {
           // Real recognition: a miss gets a gentle retry, never an error.
@@ -159,14 +161,21 @@ export function HuntScreen({navigation, route}: Props) {
         matched = true;
       }
     } catch {
-      matched = true;
+      // A camera failure retries instead of counting a photo-less find.
+      matched = false;
     }
 
-    if (matched) {
-      // Only a real find is kept, so the day's album holds exactly the goal shots.
-      if (capturedPath) {
-        savePhoto(capturedPath, theme.id);
+    if (matched && capturedPath) {
+      // Persist BEFORE counting so a find always equals a real saved photo — the
+      // daily count (files) and the star count can never drift apart.
+      const saved = await savePhoto(capturedPath, theme.id);
+      if (saved) {
+        registerFind();
+      } else {
+        gentleRetry();
       }
+    } else if (matched && !device) {
+      // Emulator with no camera: let progress happen for testing (no photo to save).
       registerFind();
     } else {
       gentleRetry();
@@ -184,8 +193,11 @@ export function HuntScreen({navigation, route}: Props) {
 
     try {
       if (camera.current && device) {
-        const photo = await camera.current.takePhoto({flash: 'off'});
-        await retakePhoto(retakePath!, theme.id, retakeDateKey!, photo.path);
+        const image = await (camera.current as any).takeSnapshot();
+        const photoPath = await image.saveToTemporaryFileAsync('jpg', 90);
+        if (photoPath) {
+          await retakePhoto(retakePath!, theme.id, retakeDateKey!, photoPath);
+        }
       }
     } catch {
       // A failed retake leaves the original photo untouched — that's fine.
@@ -225,7 +237,6 @@ export function HuntScreen({navigation, route}: Props) {
           style={StyleSheet.absoluteFill}
           device={device}
           isActive={isRetake || found < theme.goal}
-          photo
         />
       ) : (
         <View style={[StyleSheet.absoluteFill, styles.noDevice]}>
@@ -312,33 +323,25 @@ export function HuntScreen({navigation, route}: Props) {
           busy={busy}
           shakeKey={shakeKey}
         />
-        <View style={{height: 18}} />
-        {isRetake ? (
-          <PillButton
-            label="Cancel ✖️"
-            size="md"
-            color={colors.white}
-            textColor={colors.primaryDark}
-            onPress={() => {
-              if (!busy) {
-                navigation.goBack();
-              }
-            }}
-          />
-        ) : (
-          <PillButton
-            label="✅ I found it!"
-            size="md"
-            color={colors.white}
-            textColor={colors.primaryDark}
-            onPress={() => {
-              if (!busy && found < theme.goal) {
-                registerFind();
-              }
-            }}
-          />
+        {isRetake && (
+          <>
+            <View style={{height: 18}} />
+            <PillButton
+              label="Cancel ✖️"
+              size="md"
+              color={colors.white}
+              textColor={colors.primaryDark}
+              onPress={() => {
+                if (!busy) {
+                  navigation.goBack();
+                }
+              }}
+            />
+          </>
         )}
       </View>
+
+      <BackButton />
     </View>
   );
 }
