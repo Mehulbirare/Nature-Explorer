@@ -16,7 +16,6 @@
 
 <br/>
 
-<img src="./screen.png" alt="Nature Explorer screenshot" width="280"/>
 
 </div>
 
