@@ -200,6 +200,38 @@ export async function shotsForDay(
   return shots.filter(s => s.dateKey === dateKey);
 }
 
+/**
+ * Current streak: how many days in a row the daily goal was met, counting back
+ * from today. If today isn't finished yet the streak still counts through
+ * yesterday (so it only breaks after a full missed day), matching how habit
+ * trackers behave. Pure/derived from the already-loaded day groups.
+ */
+export function currentStreak(days: DayGroup[], goal: number): number {
+  const complete = new Set(
+    days.filter(d => d.shots.length >= goal).map(d => d.dateKey),
+  );
+  if (complete.size === 0) {
+    return 0;
+  }
+
+  const DAY_MS = 86400000;
+  let cursor = Date.now();
+  // Today unfinished? A streak running through yesterday is still alive.
+  if (!complete.has(dateKeyOf(cursor))) {
+    cursor -= DAY_MS;
+    if (!complete.has(dateKeyOf(cursor))) {
+      return 0;
+    }
+  }
+
+  let streak = 0;
+  while (complete.has(dateKeyOf(cursor))) {
+    streak += 1;
+    cursor -= DAY_MS;
+  }
+  return streak;
+}
+
 /** Delete one saved photo. Safe/no-op if it's already gone. */
 export async function deletePhoto(path: string): Promise<boolean> {
   const RNFS = fs();

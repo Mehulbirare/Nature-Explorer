@@ -17,7 +17,7 @@ import {Background} from '../components/Background';
 import {PillButton} from '../components/PillButton';
 import {PressableScale} from '../components/PressableScale';
 import {getHunt} from '../config/themes';
-import {DayGroup, journalDays, todayKey} from '../services/gallery';
+import {DayGroup, currentStreak, journalDays, todayKey} from '../services/gallery';
 import {colors, fonts, fontSizes, radius, shadow} from '../theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Journal'>;
@@ -48,6 +48,7 @@ export function JournalScreen({navigation, route}: Props) {
   const todayCount = today?.shots.length ?? 0;
   const doneToday = todayCount >= theme.goal;
   const pastDays = days.filter(d => d.dateKey !== todayKey());
+  const streak = currentStreak(days, theme.goal);
 
   return (
     <Background variant="welcome" overlay={0.5}>
@@ -61,6 +62,13 @@ export function JournalScreen({navigation, route}: Props) {
           <Text style={styles.emoji}>{theme.emoji}</Text>
           <Text style={styles.title}>{theme.title}</Text>
           <Text style={styles.subtitle}>Find {theme.goal} every day</Text>
+          {streak > 0 && (
+            <View style={styles.streakPill}>
+              <Text style={styles.streakText}>
+                🔥 {streak} day{streak === 1 ? '' : 's'} in a row!
+              </Text>
+            </View>
+          )}
         </Animated.View>
 
         {/* Today's task */}
@@ -177,6 +185,20 @@ const styles = StyleSheet.create({
     color: colors.white,
     opacity: 0.9,
     marginTop: 2,
+  },
+  streakPill: {
+    marginTop: 10,
+    backgroundColor: colors.sunny,
+    borderRadius: radius.pill,
+    paddingHorizontal: 18,
+    paddingVertical: 8,
+    ...shadow.soft,
+  },
+  streakText: {
+    fontFamily: fonts.heavy,
+    fontSize: fontSizes.body,
+    fontWeight: '800',
+    color: colors.primaryDark,
   },
 
   todayCard: {
