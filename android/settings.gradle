@@ -1,0 +1,12 @@
+pluginManagement {
+    // Resolve the React Native gradle plugin by direct relative path. The RN
+    // template normally spawns `node` here, but that spawn is unreliable on
+    // Windows; this path is deterministic for a standard (non-hoisted) install.
+    includeBuild("../node_modules/@react-native/gradle-plugin")
+}
+plugins { id("com.facebook.react.settings") }
+extensions.configure(com.facebook.react.ReactSettingsExtension) { ex -> ex.autolinkLibrariesFromCommand() }
+
+rootProject.name = 'NatureExplorer'
+include ':app'
+includeBuild("../node_modules/@react-native/gradle-plugin")

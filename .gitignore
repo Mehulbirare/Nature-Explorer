@@ -1,0 +1,41 @@
+# OSX
+.DS_Store
+
+# node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Metro
+.metro-health-check*
+metro.config.js.bak
+
+# Android/IntelliJ
+android/build/
+android/app/build/
+android/.gradle/
+android/.cxx/
+android/app/.cxx/
+android/local.properties
+*.keystore
+!debug.keystore
+*.iml
+.idea/
+
+# iOS
+ios/build/
+ios/Pods/
+ios/*.xcworkspace
+
+# Bundler
+vendor/
+
+# Temp
+*.log
+.vscode/
+
+# Env / secrets
+.env
+
+# Editor/tooling config
+.claude/

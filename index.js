@@ -1,0 +1,10 @@
+/**
+ * Nature Explorer — entry point
+ * Gesture Handler must be imported first, before anything else.
+ */
+import 'react-native-gesture-handler';
+import {AppRegistry} from 'react-native';
+import App from './src/App';
+import {name as appName} from './app.json';
+
+AppRegistry.registerComponent(appName, () => App);
